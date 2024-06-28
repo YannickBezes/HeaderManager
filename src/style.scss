@@ -1,0 +1,106 @@
+:root {
+    --grey-10: #FFFFFF;
+    --grey-20: #EEEFFC;
+    --grey-30: #E0E1EC;
+    --grey-40: #D2D3E0;
+    --grey-50: #B0B5C0;
+    --grey-60: #6B6F76;
+    --grey-70: #8D8BA3;
+    --grey-80: #858699;
+    --grey-90: #4C4F6B;
+    --grey-100: #4D4F69;
+    --grey-110: #444556;
+    --grey-120: #3C3D53;
+    --grey-130: #393A4B;
+    --grey-140: #313248;
+    --grey-150: #292B41;
+    --grey-160: #26293E;
+    --grey-170: #2C2D42;
+    --grey-180: #26273B;
+    --grey-190: #292A35;
+    --grey-200: #1D1E2B;
+    --grey-210: #191A23;
+    --grey-220: #151621;
+    --grey-230: #21232E;
+    --grey-240: #272832;
+    --grey-250: #2C2D3C;
+    --grey-260: #1C1D2A;
+    --grey-270: #1F2130;
+
+    // Primary
+    --primary-10: #6E79D6;
+    --primary-20: #7477F0;
+    --primary-30: #6E79D6;
+    --primary-40: #5E6AD2;
+    --primary-50: #666BE2;
+    --primary-60: #5C67C7;
+    --primary-70: #575BC7;
+    --primary-80: #37466C;
+    --primary-90: #2A2B51;
+    --primary-100: #222342;
+
+
+    --checkbox-border: #DCD8FE4F;
+    --letter-background: rgba(149, 149, 189, 0.125);
+    --background: rgba(124, 124, 164, 0.125);
+    --icon-defaultt: rgba(220, 216, 254, 0.565);
+    --button-background: rgba(133, 134, 152, 0.2);
+    --divider: rgba(82, 82, 111, 0.25);
+    --button-issue: rgba(89, 89, 116, 0.25);
+    --button-issue-hover: rgba(104, 107, 134, 0.24);
+    --file-background: rgba(67, 69, 99, 0.173);
+    --background-issue: rgba(89, 89, 116, 0.25);
+    --border-issue-border-hover: rgba(94, 93, 123, 0.44);
+    --background-sub-issue: rgba(19, 20, 32, 0.298);
+    --sub-issue-hover: rgba(27, 28, 41, 0.4);
+    --background-command-bar: rgba(29, 30, 43, 0.498);
+    --border-command-bar: rgba(82, 82, 111, 0.44);
+    --caret: #6E5ED2;
+    --linear-gradient: linear-gradient(45deg, rgba(31, 33, 48 , 0.1372), rgba(31, 33, 48, 0.1372) 14%, rgba(31, 33, 48, 0.743) 74%, rgba(31, 33, 48, 0.743));
+    --app-background: #181921;
+    --tooltip-backgorund: #202128;
+
+    color: rgba(255, 255, 255, 0.87);
+    background-color: var(--app-background);
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    margin: 0;
+
+    font-family: Consolas, sans-serif;
+    font-weight: 400;
+}
+
+h1 {
+    font-size: 3.2em;
+    line-height: 1.1;
+}
+
+button {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    background-color: #1a1a1a;
+    cursor: pointer;
+    transition: border-color 0.25s;
+}
+
+button:hover {
+    border-color: #646cff;
+}
+
+button:focus,
+button:focus-visible {
+    outline: 4px auto -webkit-focus-ring-color;
+}
+
+
+
