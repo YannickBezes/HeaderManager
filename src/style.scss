@@ -28,16 +28,24 @@
     --grey-270: #1F2130;
 
     // Primary
-    --primary-10: #6E79D6;
-    --primary-20: #7477F0;
-    --primary-30: #6E79D6;
-    --primary-40: #5E6AD2;
-    --primary-50: #666BE2;
-    --primary-60: #5C67C7;
-    --primary-70: #575BC7;
-    --primary-80: #37466C;
-    --primary-90: #2A2B51;
-    --primary-100: #222342;
+    --primary-20: #8f3fe5;
+    --primary-50: #652ba9;
+    --primary-70: #3b186d;
+    --primary-100: #110531;
+    --color-text: #fcfcfc;
+
+    --secondary-10: #6E79D6;
+    --secondary-20: #7477F0;
+    --secondary-30: #6E79D6;
+    --secondary-40: #5E6AD2;
+    --secondary-50: #666BE2;
+    --secondary-60: #5C67C7;
+    --secondary-70: #575BC7;
+    --secondary-80: #37466C;
+    --secondary-90: #2A2B51;
+    --secondary-100: #222342;
+
+
 
 
     --checkbox-border: #DCD8FE4F;
@@ -74,6 +82,7 @@ body {
 
     font-family: Consolas, sans-serif;
     font-weight: 400;
+    color: var(--color-text);
 }
 
 h1 {
