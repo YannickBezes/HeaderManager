@@ -31,7 +31,7 @@ function updateProfileName() {
 			type="text"
 			@focusout="updateProfileName"
 		/>
-		<span v-else>{{ name }}</span>
+		<span v-else class="profile-name-text">{{ name }}</span>
 	</div>
 </template>
 
@@ -40,13 +40,25 @@ function updateProfileName() {
 	font-size: 20px;
 }
 
+.profile-name-text {
+	user-select: none;
+}
+
+.profile-name-text,
+.profile-name-input {
+	color: var(--color-text);
+	font-size: unset;
+	font-family: unset;
+}
+
 .profile-name-input {
 	background-color: transparent;
 	border: none;
 	border-bottom: 2px solid transparent;
-	color: var(--grey-10);
-	font-size: unset;
-	font-family: unset;
+	margin-top: 2px; // Add offset from the bottom border
+	color: var(--color-text);
+	padding: 0;
+
 
 	&:hover {
 		border-color: var(--border-issue-border-hover);
@@ -54,7 +66,7 @@ function updateProfileName() {
 
 	&:focus {
 		outline: none;
-		border-color: var(--primary-60);
+		border-color: var(--primary-50);
 	}
 }
 </style>
