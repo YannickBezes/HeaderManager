@@ -20,13 +20,12 @@ defineProps({
 	height: 35px;
 	width: 35px;
 	border-radius: 50%;
-	color: var(--grey-10);
+	color: var(--color-text);
 	font-size: 18px;
 	font-weight: bold;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	user-select: none;
-	line-height: normal;
 }
 </style>
