@@ -85,6 +85,10 @@ body {
     color: var(--color-text);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 h1 {
     font-size: 3.2em;
     line-height: 1.1;
