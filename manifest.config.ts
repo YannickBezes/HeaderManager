@@ -13,17 +13,31 @@ export default defineManifest((env: ConfigEnv) => ({
   name: names[env.command],
   version,
   description: "HeaderManager - manage headers",
+  icons: {
+    16: "src/assets/images/headerManager_16.png",
+    32: "src/assets/images/headerManager_32.png",
+    48: "src/assets/images/headerManager_48.png",
+    128: "src/assets/images/headerManager_128.png"
+  },
   action: {
-    default_popup: 'index.html',
-    default_title: 'Modify request and response headers'
+    default_popup: "index.html",
+    default_title: "Modify request and response headers"
   },
   permissions: [
     "storage",
     "webRequest",
     "contextMenus",
-    "webRequestBlocking",
-    "<all_urls>"
+    "declarativeNetRequest"
   ],
+  declarative_net_request: {
+    rule_resources: [
+      {
+        id: "block-url",
+        enabled: true,
+        path: "block_url.json"
+      }
+    ]
+  },
   background: {
     service_worker: "src/service_worker.js"
   }
