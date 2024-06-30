@@ -1,5 +1,5 @@
-export async function getDataFromStorage<T>(key: string): Promise<T | null> {
-  const data = await chrome.storage.local.get(key);
+export async function getDataFromStorage<T>(key: keyof  ExtensionStorage): Promise<T | null> {
+  const data = await chrome.storage.local.get(key) as ExtensionStorage;
 
   if (typeof data[key] === "undefined") {
     return null;
@@ -7,6 +7,6 @@ export async function getDataFromStorage<T>(key: string): Promise<T | null> {
   return data[key] as T;
 }
 
-export function saveData(key: string, data: any): Promise<void> {
+export function saveData(key: keyof ExtensionStorage, data: any): Promise<void> {
   return chrome.storage.local.set({[key]: data});
 }

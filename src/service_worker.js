@@ -1,98 +1,119 @@
-// const browser = chrome;
-// const SPECIAL_CHARS = '^$&+?.()|{}[]/'.split('');
-// const MAX_PROFILES_IN_CLOUD = 50;
-// const CHROME_VERSION = getChromeVersion();
-// const EXTRA_REQUEST_HEADERS = new Set(['accept-language', 'accept-encoding', 'referer', 'cookie']);
-// const EXTRA_RESPONSE_HEADERS = new Set(['set-cookie']);
-// let currentProfile;
-// let tabUrls = {};
-//
-// /**
-//  * Check whether the current request url pass the given list of filters.
-//  */
-// function passFilters_(url, type, filters) {
-// 	if (!filters) {
-// 		return true;
-// 	}
-// 	let allowUrls = false;
-// 	let hasUrlFilters = false;
-// 	let allowTypes = false;
-// 	let hasResourceTypeFilters = false;
-// 	for (let filter of filters) {
-// 		if (filter.enabled) {
-// 			switch (filter.type) {
-// 				case 'urls':
-// 					hasUrlFilters = true;
-// 					if (url.search(filter.urlRegex) == 0) {
-// 						allowUrls = true;
-// 					}
-// 					break;
-// 				case 'types':
-// 					hasResourceTypeFilters = true;
-// 					if (filter.resourceType.indexOf(type) >= 0) {
-// 						allowTypes = true;
-// 					}
-// 					break;
-// 			}
-// 		}
-// 	}
-// 	return (!hasUrlFilters || allowUrls)
-// 		&& (!hasResourceTypeFilters || allowTypes);
-// };
-//
-// function loadSelectedProfile_() {
-// 	let appendMode = false;
-// 	let headers = [];
-// 	let respHeaders = [];
-// 	let filters = [];
-// 	if (localStorage.profiles) {
-// 		const profiles = JSON.parse(localStorage.profiles);
-// 		if (!localStorage.selectedProfile) {
-// 			localStorage.selectedProfile = 0;
-// 		}
-// 		const selectedProfile = profiles[localStorage.selectedProfile];
-//
-// 		function filterEnabledHeaders_(headers) {
-// 			let output = [];
-// 			for (let header of headers) {
-// 				// Overrides the header if it is enabled and its name is not empty.
-// 				if (header.enabled && header.name) {
-// 					output.push({name: header.name, value: header.value});
-// 				}
-// 			}
-// 			return output;
-// 		};
-// 		for (let filter of selectedProfile.filters) {
-// 			if (filter.urlPattern) {
-// 				const urlPattern = filter.urlPattern;
-// 				const joiner = [];
-// 				for (let i = 0; i < urlPattern.length; ++i) {
-// 					let c = urlPattern.charAt(i);
-// 					if (SPECIAL_CHARS.indexOf(c) >= 0) {
-// 						c = '\\' + c;
-// 					} else if (c == '\\') {
-// 						c = '\\\\';
-// 					} else if (c == '*') {
-// 						c = '.*';
-// 					}
-// 					joiner.push(c);
-// 				}
-// 				filter.urlRegex = joiner.join('');
-// 			}
-// 			filters.push(filter);
-// 		}
-// 		appendMode = selectedProfile.appendMode;
-// 		headers = filterEnabledHeaders_(selectedProfile.headers);
-// 		respHeaders = filterEnabledHeaders_(selectedProfile.respHeaders);
-// 	}
-// 	return {
-// 		appendMode: appendMode,
-// 		headers: headers,
-// 		respHeaders: respHeaders,
-// 		filters: filters
-// 	};
-// };
-//
+function getChromeVersion() {
+	let pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);
+	if (pieces == null || pieces.length !== 5) {
+		return {};
+	}
+	pieces = pieces.map(piece => parseInt(piece, 10));
+	return {
+		major: pieces[1],
+		minor: pieces[2],
+		build: pieces[3],
+		patch: pieces[4]
+	};
+}
+
+const browser = chrome;
+const CHROME_VERSION = getChromeVersion();
+const SPECIAL_CHARS = "^$&+?.()|{}[]/".split("");
+const MAX_PROFILES_IN_CLOUD = 50;
+const EXTRA_REQUEST_HEADERS = new Set([ "accept-language", "accept-encoding", "referer", "cookie" ]);
+const EXTRA_RESPONSE_HEADERS = new Set([ "set-cookie" ]);
+let currentProfile;
+let tabUrls = {};
+
+/**
+ * Check whether the current request url pass the given list of filters.
+ */
+function passFilters_(url, type, filters) {
+	if (!filters) {
+		return true;
+	}
+
+	let allowUrls = false;
+	let hasUrlFilters = false;
+	let allowTypes = false;
+	let hasResourceTypeFilters = false;
+	for (let filter of filters) {
+		if (filter.enabled) {
+			switch (filter.type) {
+				case "urls":
+					hasUrlFilters = true;
+					if (url.search(filter.urlRegex) === 0) {
+						allowUrls = true;
+					}
+					break;
+				case "types":
+					hasResourceTypeFilters = true;
+					if (filter.resourceType.indexOf(type) >= 0) {
+						allowTypes = true;
+					}
+					break;
+			}
+		}
+	}
+	return (
+		(!hasUrlFilters || allowUrls)
+		&& (!hasResourceTypeFilters || allowTypes)
+	);
+}
+
+async function loadSelectedProfile_() {
+	let appendMode = false;
+	let headers = [];
+	let respHeaders = [];
+	let filters = [];
+
+	/** @type {ExtensionStorage} */
+	const storage = await chrome.storage.local.get() ?? null;
+	if (typeof storage.profiles !== "undefined") {
+		const profiles = storage.profiles;
+		if (!storage.selectedProfile) {
+			storage.selectedProfile = 0;
+		}
+		const selectedProfile = profiles[storage.selectedProfile];
+
+		function filterEnabledHeaders_(headers) {
+			let output = [];
+			for (let header of headers) {
+				// Overrides the header if it is enabled and its name is not empty.
+				if (header.enabled && header.name) {
+					output.push({ name: header.name, value: header.value });
+				}
+			}
+			return output;
+		}
+
+		for (let filter of selectedProfile.filters) {
+			if (filter.urlPattern) {
+				const urlPattern = filter.urlPattern;
+				const joiner = [];
+				for (let i = 0; i < urlPattern.length; ++i) {
+					let c = urlPattern.charAt(i);
+					if (SPECIAL_CHARS.indexOf(c) >= 0) {
+						c = "\\" + c;
+					} else if (c === "\\") {
+						c = "\\\\";
+					} else if (c === "*") {
+						c = ".*";
+					}
+					joiner.push(c);
+				}
+				filter.urlRegex = joiner.join("");
+			}
+			filters.push(filter);
+		}
+		// 	appendMode = selectedProfile.appendMode;
+		// 	headers = filterEnabledHeaders_(selectedProfile.headers);
+		// 	respHeaders = filterEnabledHeaders_(selectedProfile.respHeaders);
+	}
+	return {
+		appendMode: appendMode,
+		headers: headers,
+		respHeaders: respHeaders,
+		filters: filters
+	};
+};
+
 // function modifyHeader(source, dest) {
 // 	if (!source.length) {
 // 		return;
@@ -109,26 +130,26 @@
 // 		if (index !== undefined) {
 // 			if (!currentProfile.appendMode) {
 // 				dest[index].value = header.value;
-// 			} else if (currentProfile.appendMode == 'comma') {
+// 			} else if (currentProfile.appendMode == "comma") {
 // 				if (dest[index].value) {
-// 					dest[index].value += ',';
+// 					dest[index].value += ",";
 // 				}
 // 				dest[index].value += header.value;
 // 			} else {
 // 				dest[index].value += header.value;
 // 			}
 // 		} else {
-// 			dest.push({name: header.name, value: header.value});
+// 			dest.push({ name: header.name, value: header.value });
 // 			indexMap[header.name.toLowerCase()] = dest.length - 1;
 // 		}
 // 	}
 // };
-//
+
 // function modifyRequestHeaderHandler_(details) {
 // 	if (localStorage.isPaused) {
 // 		return {};
 // 	}
-// 	if (details.type == 'main_frame' && details.url && details.tabId) {
+// 	if (details.type == "main_frame" && details.url && details.tabId) {
 // 		tabUrls[details.tabId] = details.url;
 // 		localStorage.activeTabId = details.tabId;
 // 		browser.tabs.get(details.tabId, onTabUpdated);
@@ -140,9 +161,9 @@
 // 			modifyHeader(currentProfile.headers, details.requestHeaders);
 // 		}
 // 	}
-// 	return {requestHeaders: details.requestHeaders};
-// };
-//
+// 	return { requestHeaders: details.requestHeaders };
+// }
+
 // function modifyResponseHeaderHandler_(details) {
 // 	if (localStorage.isPaused) {
 // 		return {};
@@ -155,26 +176,12 @@
 // 			const responseHeaders = JSON.parse(serializedOriginalResponseHeaders);
 // 			modifyHeader(currentProfile.respHeaders, responseHeaders);
 // 			if (JSON.stringify(responseHeaders) != serializedOriginalResponseHeaders) {
-// 				return {responseHeaders: responseHeaders};
+// 				return { responseHeaders: responseHeaders };
 // 			}
 // 		}
 // 	}
 // };
-//
-// function getChromeVersion() {
-// 	let pieces = navigator.userAgent.match(/Chrom(?:e|ium)\/([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)/);
-// 	if (pieces == null || pieces.length != 5) {
-// 		return {};
-// 	}
-// 	pieces = pieces.map(piece => parseInt(piece, 10));
-// 	return {
-// 		major: pieces[1],
-// 		minor: pieces[2],
-// 		build: pieces[3],
-// 		patch: pieces[4]
-// 	};
-// }
-//
+
 // function setupHeaderModListener() {
 // 	browser.webRequest.onBeforeSendHeaders.removeListener(modifyRequestHeaderHandler_);
 // 	browser.webRequest.onHeadersReceived.removeListener(modifyResponseHeaderHandler_);
@@ -193,8 +200,8 @@
 // 		}
 // 		browser.webRequest.onBeforeSendHeaders.addListener(
 // 			modifyRequestHeaderHandler_,
-// 			{urls: ["<all_urls>"]},
-// 			requiresExtraRequestHeaders ? ['requestHeaders', 'blocking', 'extraHeaders'] : ['requestHeaders', 'blocking']
+// 			{ urls: [ "<all_urls>" ] },
+// 			requiresExtraRequestHeaders ? [ "requestHeaders", "blocking", "extraHeaders" ] : [ "requestHeaders", "blocking" ]
 // 		);
 // 	}
 // 	if (currentProfile.respHeaders.length > 0) {
@@ -209,12 +216,12 @@
 // 		}
 // 		browser.webRequest.onHeadersReceived.addListener(
 // 			modifyResponseHeaderHandler_,
-// 			{urls: ["<all_urls>"]},
-// 			requiresExtraResponseHeaders ? ['responseHeaders', 'blocking', 'extraHeaders'] : ['responseHeaders', 'blocking']
+// 			{ urls: [ "<all_urls>" ] },
+// 			requiresExtraResponseHeaders ? [ "responseHeaders", "blocking", "extraHeaders" ] : [ "responseHeaders", "blocking" ]
 // 		);
 // 	}
 // }
-//
+
 // function onTabUpdated(tab) {
 // 	if (tab.active) {
 // 		delete localStorage.currentTabUrl;
@@ -242,61 +249,44 @@
 // 		resetBadgeAndContextMenu();
 // 	}
 // }
-//
+
 // browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 // 	onTabUpdated(tab);
 // });
-//
+
 // browser.tabs.onActivated.addListener((activeInfo) => {
 // 	browser.tabs.get(activeInfo.tabId, onTabUpdated);
 // });
-//
+
 // browser.windows.onFocusChanged.addListener((windowId) => {
 // 	if (windowId == browser.windows.WINDOW_ID_NONE) {
 // 		return;
 // 	}
-// 	browser.windows.get(windowId, {populate: true}, (win) => {
+// 	browser.windows.get(windowId, { populate: true }, (win) => {
 // 		for (let tab of win.tabs) {
 // 			onTabUpdated(tab);
 // 		}
 // 	});
 // });
-//
-// function saveStorageToCloud() {
-// 	browser.storage.sync.get(null, (items) => {
-// 		const keys = items ? Object.keys(items) : [];
-// 		keys.sort();
-// 		if (keys.length == 0 ||
-// 			items[keys[keys.length - 1]] != localStorage.profiles) {
-// 			const data = {};
-// 			data[Date.now()] = localStorage.profiles;
-// 			browser.storage.sync.set(data);
-// 			localStorage.savedToCloud = true;
-// 		}
-// 		if (keys.length >= MAX_PROFILES_IN_CLOUD) {
-// 			browser.storage.sync.remove(keys.slice(0, keys.length - MAX_PROFILES_IN_CLOUD));
-// 		}
-// 	});
-// }
-//
+
 // function createContextMenu() {
 // 	if (localStorage.isPaused) {
 // 		browser.contextMenus.update(
-// 			'pause',
+// 			"pause",
 // 			{
-// 				title: 'Unpause HeaderManager',
-// 				contexts: ['browser_action'],
+// 				title: "Unpause HeaderManager",
+// 				contexts: [ "browser_action" ],
 // 				onclick: () => {
-// 					localStorage.removeItem('isPaused');
+// 					localStorage.removeItem("isPaused");
 // 					resetBadgeAndContextMenu();
 // 				}
 // 			});
 // 	} else {
 // 		browser.contextMenus.update(
-// 			'pause',
+// 			"pause",
 // 			{
-// 				title: 'Pause HeaderManager',
-// 				contexts: ['browser_action'],
+// 				title: "Pause HeaderManager",
+// 				contexts: [ "browser_action" ],
 // 				onclick: () => {
 // 					localStorage.isPaused = true;
 // 					resetBadgeAndContextMenu();
@@ -305,21 +295,21 @@
 // 	}
 // 	if (localStorage.lockedTabId) {
 // 		browser.contextMenus.update(
-// 			'lock',
+// 			"lock",
 // 			{
-// 				title: 'Unlock to all tabs',
-// 				contexts: ['browser_action'],
+// 				title: "Unlock to all tabs",
+// 				contexts: [ "browser_action" ],
 // 				onclick: () => {
-// 					localStorage.removeItem('lockedTabId');
+// 					localStorage.removeItem("lockedTabId");
 // 					resetBadgeAndContextMenu();
 // 				}
 // 			});
 // 	} else {
 // 		browser.contextMenus.update(
-// 			'lock',
+// 			"lock",
 // 			{
-// 				title: 'Lock to this tab',
-// 				contexts: ['browser_action'],
+// 				title: "Lock to this tab",
+// 				contexts: [ "browser_action" ],
 // 				onclick: () => {
 // 					localStorage.lockedTabId = localStorage.activeTabId;
 // 					resetBadgeAndContextMenu();
@@ -327,71 +317,54 @@
 // 			});
 // 	}
 // }
-//
+
 // function resetBadgeAndContextMenu() {
 // 	if (localStorage.isPaused) {
-// 		browser.browserAction.setIcon({path: 'icon_bw.png'});
-// 		browser.browserAction.setBadgeText({text: '\u275A\u275A'});
-// 		browser.browserAction.setBadgeBackgroundColor({color: '#666'});
+// 		browser.browserAction.setIcon({ path: "icon_bw.png" });
+// 		browser.browserAction.setBadgeText({ text: "\u275A\u275A" });
+// 		browser.browserAction.setBadgeBackgroundColor({ color: "#666" });
 // 	} else {
 // 		const numHeaders = (currentProfile.headers.length + currentProfile.respHeaders.length);
 // 		if (numHeaders == 0) {
-// 			browser.browserAction.setBadgeText({text: ''});
-// 			browser.browserAction.setIcon({path: 'icon_bw.png'});
+// 			browser.browserAction.setBadgeText({ text: "" });
+// 			browser.browserAction.setIcon({ path: "icon_bw.png" });
 // 		} else if (localStorage.lockedTabId
 // 			&& localStorage.lockedTabId != localStorage.activeTabId) {
-// 			browser.browserAction.setIcon({path: 'icon_bw.png'});
-// 			browser.browserAction.setBadgeText({text: '\uD83D\uDD12'});
-// 			browser.browserAction.setBadgeBackgroundColor({color: '#ff8e8e'});
+// 			browser.browserAction.setIcon({ path: "icon_bw.png" });
+// 			browser.browserAction.setBadgeText({ text: "\uD83D\uDD12" });
+// 			browser.browserAction.setBadgeBackgroundColor({ color: "#ff8e8e" });
 // 		} else {
-// 			browser.browserAction.setIcon({path: 'icon.png'});
-// 			browser.browserAction.setBadgeText({text: numHeaders.toString()});
-// 			browser.browserAction.setBadgeBackgroundColor({color: '#db4343'});
+// 			browser.browserAction.setIcon({ path: "icon.png" });
+// 			browser.browserAction.setBadgeText({ text: numHeaders.toString() });
+// 			browser.browserAction.setBadgeBackgroundColor({ color: "#db4343" });
 // 		}
 // 	}
 // 	createContextMenu();
 // }
-//
-// function initializeStorage() {
-// 	currentProfile = loadSelectedProfile_();
-// 	setupHeaderModListener();
-//
-// 	window.addEventListener('storage', function(e) {
-// 		currentProfile = loadSelectedProfile_();
-// 		setupHeaderModListener();
-// 		resetBadgeAndContextMenu();
-// 		if (e.key == 'profiles') {
-// 			saveStorageToCloud();
-// 		}
-// 	});
-//
-// 	// Async initialization.
-// 	setTimeout(() => {
-// 		if (localStorage.profiles && !localStorage.savedToCloud) {
-// 			saveStorageToCloud();
-// 		}
-//
-// 		if (!localStorage.profiles) {
-// 			browser.storage.sync.get(null, (items) => {
-// 				const keys = items ? Object.keys(items) : [];
-// 				keys.sort();
-// 				if (keys.length > 0) {
-// 					localStorage.profiles = items[keys[keys.length - 1]];
-// 					localStorage.savedToCloud = true;
-// 				}
-// 			});
-// 		}
-// 	}, 100);
-// }
-// browser.contextMenus.create({
-// 	id: 'pause',
-// 	title: 'Pause',
-// 	contexts: ['browser_action'],
-// });
-// browser.contextMenus.create({
-// 	id: 'lock',
-// 	title: 'Lock',
-// 	contexts: ['browser_action'],
-// });
-// initializeStorage();
+
+async function initializeStorage() {
+	currentProfile = loadSelectedProfile_();
+	// setupHeaderModListener();
+
+	const localStorage = await browser.storage.local.get();
+	chrome.storage.local.onChanged.addListener(async (e) => {
+		currentProfile = await loadSelectedProfile_();
+		// setupHeaderModListener();
+		// resetBadgeAndContextMenu();
+	});
+}
+
+
+initializeStorage();
 // resetBadgeAndContextMenu();
+
+browser.contextMenus.create({
+	id: "pause",
+	title: "Pause",
+	contexts: [ "browser_action" ]
+});
+browser.contextMenus.create({
+	id: "lock",
+	title: "Lock",
+	contexts: [ "browser_action" ]
+});

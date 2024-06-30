@@ -38,7 +38,7 @@ function updateProfile() {
 	}
 
 	profileStore.updateProfile(profileStore.currentProfileId, {
-		...profileStore.currentProfile,
+		...profileStore.currentProfile as Profile,
 		request: {
 			...profileStore.currentProfile.request,
 			headers: props.type === HEADER_TYPE.request ? headers.value : profileStore.currentProfile.request.headers as Header[],
@@ -46,7 +46,7 @@ function updateProfile() {
 		response: {
 			...profileStore.currentProfile.response,
 			headers: props.type === HEADER_TYPE.response ? headers.value : profileStore.currentProfile.response.headers as Header[],
-		},
+		}
 	});
 }
 

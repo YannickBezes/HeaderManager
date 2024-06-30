@@ -3,18 +3,25 @@ import TopBar from "./components/top-bar.vue";
 import {useProfileStore} from "./stores/profile.store.ts";
 import HeaderList from "./components/header-list.vue";
 import {HEADER_TYPE} from "./constants.ts";
+import {ref} from "vue";
 
 const profileStore = useProfileStore();
-profileStore.loadProfiles();
+const isLoading = ref(true);
+profileStore
+	.loadProfiles()
+	.then(() => isLoading.value = false);
 </script>
 
 <template>
-  <div class="container">
-	  <top-bar />
+	<div class="container">
+		<!-- TODO: loader -->
+		<template v-if="!isLoading">
+			<top-bar/>
 
-	  <header-list :type="HEADER_TYPE.request" />
-	  <header-list :type="HEADER_TYPE.response" />
-  </div>
+			<header-list :type="HEADER_TYPE.request"/>
+			<header-list :type="HEADER_TYPE.response"/>
+		</template>
+	</div>
 </template>
 
 <style scoped>

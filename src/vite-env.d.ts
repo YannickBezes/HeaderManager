@@ -1,12 +1,17 @@
 /// <reference types="vite/client" />
 
-interface Header {
+type Header = {
   name: string;
   value: string;
   active: boolean
 }
 
-interface Profile {
+type Filter = {
+  urlPattern: string;
+  urlRegex: string
+}
+
+type Profile = {
   id: number,
   name: string,
   request: {
@@ -15,5 +20,13 @@ interface Profile {
   response: {
     headers: Array<Header>
   },
-  activate: boolean
+  activate: boolean,
+  filters: Filter[],
+  appendMode: Boolean,
+}
+
+type ExtensionStorage = {
+  profiles: Profile[];
+  selectedProfile: number;
+  savedToCloud: Boolean
 }

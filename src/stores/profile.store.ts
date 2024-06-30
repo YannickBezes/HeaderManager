@@ -4,10 +4,7 @@ import {getDataFromStorage, saveData} from "../services/local-storage.service.ts
 import {ProfileNotFoundError} from "../errors/profile-not-found.error.ts";
 import {deepCopy} from "../services/helper.ts";
 
-const STORAGE_KEY: string = "profiles";
 const DEFAULT_PREFIX_NAME: string = "Profile";
-
-
 
 export const useProfileStore = defineStore("profile", () => {
   const currentProfileId = ref<number | null>(null);
@@ -37,23 +34,30 @@ export const useProfileStore = defineStore("profile", () => {
           {
             name: "",
             value: "",
-            active: true,
+            active: true
           }
         ]
       },
       response: {
         headers: []
       },
-      activate: true
+      activate: true,
+      filters: [],
+      appendMode: false
     };
   }
 
   function saveProfile() {
-    return saveData(STORAGE_KEY, deepCopy(profiles.value));
+    return Promise.all([
+      saveData("profiles", deepCopy(profiles.value)),
+      saveData("selectedProfile", currentProfileId.value),
+    ]);
   }
 
   async function loadProfiles() {
-    const data = await getDataFromStorage<Array<Profile>>(STORAGE_KEY) ?? [];
+    const data = await getDataFromStorage<Array<Profile>>("profiles") ?? [];
+    const selectedProfileIndex = await getDataFromStorage<number>("selectedProfile") ?? 0;
+
     if (data.length === 0) {
       const newProfile = createProfile();
       data.push(newProfile);
@@ -62,9 +66,7 @@ export const useProfileStore = defineStore("profile", () => {
     profiles.value = data;
 
     // Set currentProfile
-    const currentProfile = profiles.value
-      .find(profile => profile.activate) ?? profiles.value[0];
-    currentProfileId.value = currentProfile.id;
+    currentProfileId.value = profiles.value[selectedProfileIndex].id;
   }
 
   function updateProfile(id: number, updatedProfile: Profile) {
