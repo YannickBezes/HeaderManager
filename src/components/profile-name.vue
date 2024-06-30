@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {useProfileStore} from "../stores/profile.store.ts";
 import {ref} from "vue";
+import VInput from "./v-input.vue";
 
 const props = defineProps({
 	profileId: {
@@ -24,12 +25,10 @@ function updateProfileName() {
 
 <template>
 	<div class="profile-name-container">
-		<input
+		<v-input
 			v-if="editable"
 			v-model="name"
-			class="profile-name-input"
-			type="text"
-			@focusout="updateProfileName"
+			@input="updateProfileName"
 		/>
 		<span v-else class="profile-name-text">{{ name }}</span>
 	</div>
@@ -42,31 +41,9 @@ function updateProfileName() {
 
 .profile-name-text {
 	user-select: none;
-}
-
-.profile-name-text,
-.profile-name-input {
 	color: var(--color-text);
 	font-size: unset;
 	font-family: unset;
 }
 
-.profile-name-input {
-	background-color: transparent;
-	border: none;
-	border-bottom: 2px solid transparent;
-	margin-top: 2px; // Add offset from the bottom border
-	color: var(--color-text);
-	padding: 0;
-
-
-	&:hover {
-		border-color: var(--border-issue-border-hover);
-	}
-
-	&:focus {
-		outline: none;
-		border-color: var(--primary-50);
-	}
-}
 </style>

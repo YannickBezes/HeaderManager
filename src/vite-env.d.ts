@@ -1,13 +1,19 @@
 /// <reference types="vite/client" />
 
+interface Header {
+  name: string;
+  value: string;
+  active: boolean
+}
+
 interface Profile {
   id: number,
   name: string,
   request: {
-    headers: Map<string, string>
+    headers: Array<Header>
   },
   response: {
-    headers: Map<string, string>
+    headers: Array<Header>
   },
   activate: boolean
 }

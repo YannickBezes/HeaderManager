@@ -27,7 +27,6 @@ const currentProfile = profileStore.currentProfile;
 .top-bar {
 	background-color: var(--grey-180);
 	color: white;
-	position: fixed;
 	width: 100%;
 	align-items: center;
 	padding: 10px;

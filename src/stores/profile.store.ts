@@ -27,14 +27,21 @@ export const useProfileStore = defineStore("profile", () => {
 
   function createProfile(): Profile {
     const id = profiles.value.length + 1;
+
     return {
       id,
       name: `${ DEFAULT_PREFIX_NAME } ${ id }`,
       request: {
-        headers: new Map<string, string>()
+        headers: [
+          {
+            name: "",
+            value: "",
+            active: true,
+          }
+        ]
       },
       response: {
-        headers: new Map<string, string>()
+        headers: []
       },
       activate: true
     };
