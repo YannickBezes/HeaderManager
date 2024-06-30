@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import {computed, ComputedRef, DeepReadonly, readonly, ref} from "vue";
 import {getDataFromStorage, saveData} from "../services/local-storage.service.ts";
 import {ProfileNotFoundError} from "../errors/profile-not-found.error.ts";
+import {deepCopy} from "../services/helper.ts";
 
 const STORAGE_KEY: string = "profiles";
 const DEFAULT_PREFIX_NAME: string = "Profile";
@@ -48,11 +49,11 @@ export const useProfileStore = defineStore("profile", () => {
   }
 
   function saveProfile() {
-    saveData(STORAGE_KEY, profiles.value);
+    return saveData(STORAGE_KEY, deepCopy(profiles.value));
   }
 
-  function loadProfiles() {
-    const data = getDataFromStorage<Array<Profile>>(STORAGE_KEY) ?? [];
+  async function loadProfiles() {
+    const data = await getDataFromStorage<Array<Profile>>(STORAGE_KEY) ?? [];
     if (data.length === 0) {
       const newProfile = createProfile();
       data.push(newProfile);

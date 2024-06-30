@@ -36,7 +36,7 @@ function updateProfileName() {
 
 <style lang="scss" scoped>
 .profile-name-container {
-	font-size: 20px;
+	font-size: 1.5rem;
 }
 
 .profile-name-text {

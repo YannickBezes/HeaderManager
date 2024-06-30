@@ -39,6 +39,7 @@ export default defineManifest((env: ConfigEnv) => ({
     ]
   },
   background: {
-    service_worker: "src/service_worker.js"
+    service_worker: "src/service_worker.js",
+    type: "module"
   }
 }));

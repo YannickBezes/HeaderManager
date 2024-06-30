@@ -1,11 +1,12 @@
-export function getDataFromStorage<T>(key: string): T|null {
-  const data = localStorage.getItem(key);
-  if (!data) {
+export async function getDataFromStorage<T>(key: string): Promise<T | null> {
+  const data = await chrome.storage.local.get(key);
+
+  if (typeof data[key] === "undefined") {
     return null;
   }
-  return JSON.parse(data);
+  return data[key] as T;
 }
 
-export function saveData(key: string, data: any): void {
-  localStorage.setItem(key, JSON.stringify(data));
+export function saveData(key: string, data: any): Promise<void> {
+  return chrome.storage.local.set({[key]: data});
 }

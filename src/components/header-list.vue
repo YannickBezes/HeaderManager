@@ -5,7 +5,7 @@ import {useProfileStore} from "../stores/profile.store.ts";
 import VInput from "./v-input.vue";
 import DeleteIcon from "../assets/icons/delete.svg";
 import VCheckbox from "./v-checkbox.vue";
-
+import {deepCopy} from "../services/helper.ts";
 
 const props = defineProps({
 	type: {
@@ -17,16 +17,16 @@ const props = defineProps({
 const title = computed(() => props.type === HEADER_TYPE.request ? "Request headers" : "Response headers");
 
 const profileStore = useProfileStore();
-const headers = computed(() => {
+const headers = computed<Header[]>(() => {
 	if (profileStore.currentProfile === null) {
 		return [];
 	}
 
-	return (
+	return deepCopy<Header[]>(
 		props.type === HEADER_TYPE.request
-			? profileStore.currentProfile.request.headers
-			: profileStore.currentProfile.response.headers
-	).map(header => ({...header}));
+			? profileStore.currentProfile.request.headers as Header[]
+			: profileStore.currentProfile.response.headers as Header[]
+	);
 });
 
 function updateProfile() {
@@ -52,6 +52,15 @@ function updateProfile() {
 
 function deleteHeader(headerIndex: number) {
 	headers.value.splice(headerIndex, 1);
+	updateProfile();
+}
+
+function addHeader(): void {
+	headers.value.push({
+		name: "",
+		value: "",
+		active: true
+	});
 	updateProfile();
 }
 </script>
@@ -83,6 +92,13 @@ function deleteHeader(headerIndex: number) {
 				tabindex="0"
 			/>
 		</div>
+
+		<button
+			class="add-header"
+			@click="addHeader"
+		>
+			{{ type === HEADER_TYPE.request ? "Add request header" : "Add response header" }}
+		</button>
 	</div>
 </template>
 
@@ -99,6 +115,7 @@ function deleteHeader(headerIndex: number) {
 	margin: 0;
 	font-weight: bold;
 	user-select: none;
+	font-size: 1.2rem;
 }
 
 .header-row {
@@ -110,6 +127,7 @@ function deleteHeader(headerIndex: number) {
 
 	> input {
 		flex: 1;
+		font-size: 1rem;
 	}
 }
 
@@ -131,4 +149,23 @@ function deleteHeader(headerIndex: number) {
 	}
 }
 
+.add-header {
+	background: var(--button-background);
+	color: var(--grey-20);
+	border: none;
+	border-radius: 4px;
+	padding: 8px 10px;
+	font-size: 1rem;
+	font-weight: bold;
+	cursor: pointer;
+	transition: border-color 0.25s;
+
+	&:hover {
+		background: var(--primary-70);
+	}
+
+	&:focus-visible {
+		outline: 2px solid var(--primary-20);
+	}
+}
 </style>
